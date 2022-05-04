@@ -59,7 +59,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
 
         self._init_graph()
 
-
     def _init_graph(self):
         self.graph = tf.Graph()
         with self.graph.as_default():
@@ -168,12 +167,10 @@ class DeepFM(BaseEstimator, TransformerMixin):
             if self.verbose > 0:
                 print("#params: %d" % total_parameters)
 
-
     def _init_session(self):
         config = tf.ConfigProto(device_count={"gpu": 0})
         config.gpu_options.allow_growth = True
         return tf.Session(config=config)
-
 
     def _initialize_weights(self):
         weights = dict()
@@ -217,7 +214,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
 
         return weights
 
-
     def batch_norm_layer(self, x, train_phase, scope_bn):
         bn_train = batch_norm(x, decay=self.batch_norm_decay, center=True, scale=True, updates_collections=None,
                               is_training=True, reuse=None, trainable=True, scope=scope_bn)
@@ -226,13 +222,11 @@ class DeepFM(BaseEstimator, TransformerMixin):
         z = tf.cond(train_phase, lambda: bn_train, lambda: bn_inference)
         return z
 
-
     def get_batch(self, Xi, Xv, y, batch_size, index):
         start = index * batch_size
         end = (index+1) * batch_size
         end = end if end < len(y) else len(y)
         return Xi[start:end], Xv[start:end], [[y_] for y_ in y[start:end]]
-
 
     # shuffle three lists simutaneously
     def shuffle_in_unison_scary(self, a, b, c):
@@ -243,7 +237,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
         np.random.set_state(rng_state)
         np.random.shuffle(c)
 
-
     def fit_on_batch(self, Xi, Xv, y):
         feed_dict = {self.feat_index: Xi,
                      self.feat_value: Xv,
@@ -253,7 +246,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
                      self.train_phase: True}
         loss, opt = self.sess.run((self.loss, self.optimizer), feed_dict=feed_dict)
         return loss
-
 
     def fit(self, Xi_train, Xv_train, y_train,
             Xi_valid=None, Xv_valid=None, y_valid=None,
@@ -322,7 +314,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
                     ((not self.greater_is_better) and train_result < best_train_score):
                     break
 
-
     def training_termination(self, valid_result):
         if len(valid_result) > 5:
             if self.greater_is_better:
@@ -338,7 +329,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
                     valid_result[-4] > valid_result[-5]:
                     return True
         return False
-
 
     def predict(self, Xi, Xv):
         """
@@ -370,7 +360,6 @@ class DeepFM(BaseEstimator, TransformerMixin):
             Xi_batch, Xv_batch, y_batch = self.get_batch(Xi, Xv, dummy_y, self.batch_size, batch_index)
 
         return y_pred
-
 
     def evaluate(self, Xi, Xv, y):
         """
